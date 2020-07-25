@@ -1,0 +1,560 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- saved from url=(0090)https://wrprod01-prod-useast1.mathworks.com/static/gPBYPGuD/MATLAB%20Drive/CT/html/Q1.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>Q1</title><meta name="generator" content="MATLAB 9.8"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-04-05"><meta name="DC.source" content="Q1.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; }
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+span.typesection { color:#A0522D }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body data-gr-c-s-loaded="true"><div class="content"><pre class="codeinput">close <span class="string">all</span>;
+clear <span class="string">all</span>;
+
+I=double(imread(<span class="string">'SheppLogan256.png'</span>));
+
+
+N=size(I,1);
+
+theta = 0:3:177;
+N_theta = length(theta);
+[R,xp] = radon(I,theta);
+
+I0=iradon(R, theta);
+figure();
+imshow(uint8(I0));
+title(<span class="string">"Normal Back Propagation"</span>);
+
+<span class="comment">% make a Ram-Lak filter. it's just abs(f).</span>
+N1 = length(xp);
+freqs=linspace(-1, 1, N1).';
+myFilter = abs( freqs );
+L=1;
+myFilter( myFilter &gt; 1 ) = 0;
+myFilter = repmat(myFilter, [1 N_theta]);
+
+<span class="comment">% do my own FT domain filtering</span>
+ft_R = fftshift(fft(R,[],1),1);
+filteredProj = ft_R .* myFilter;
+filteredProj = ifftshift(filteredProj,1);
+ift_R = real(ifft(filteredProj,[],1));
+
+<span class="comment">% tell matlab to do inverse FBP without a filter</span>
+I1 = iradon(ift_R, theta, <span class="string">'linear'</span>, <span class="string">'none'</span>, 1.0, N);
+figure();
+imshow(uint8(I1));
+title(<span class="string">"Ram-Lak filter on wmax"</span>);
+
+
+
+<span class="comment">% make a Ram-Lak filter. it's just abs(f).</span>
+N1 = length(xp);
+freqs=linspace(-1, 1, N1).';
+myFilter = 2*L*abs(sin(pi*freqs/(2*L)))/pi;
+
+myFilter( myFilter &gt; 1 ) = 0;
+myFilter = repmat(myFilter, [1 N_theta]);
+
+<span class="comment">% do my own FT domain filtering</span>
+ft_R = fftshift(fft(R,[],1),1);
+filteredProj = ft_R .* myFilter;
+filteredProj = ifftshift(filteredProj,1);
+ift_R = real(ifft(filteredProj,[],1));
+
+<span class="comment">% tell matlab to do inverse FBP without a filter</span>
+I2 = iradon(ift_R, theta, <span class="string">'linear'</span>, <span class="string">'none'</span>, 1.0, N);
+figure();
+imshow(uint8(I2));
+title(<span class="string">"Shepp-Logan filter on wmax"</span>)
+
+N1 = length(xp);
+freqs=linspace(-1, 1, N1).';
+myFilter = abs(freqs).*cos(pi*freqs/(2*L));
+
+myFilter( myFilter &gt; 1 ) = 0;
+myFilter = repmat(myFilter, [1 N_theta]);
+
+<span class="comment">% do my own FT domain filtering</span>
+ft_R = fftshift(fft(R,[],1),1);
+filteredProj = ft_R .* myFilter;
+filteredProj = ifftshift(filteredProj,1);
+ift_R = real(ifft(filteredProj,[],1));
+
+<span class="comment">% tell matlab to do inverse FBP without a filter</span>
+I3 = iradon(ift_R, theta, <span class="string">'linear'</span>, <span class="string">'none'</span>, 1.0, N);
+figure();
+imshow(uint8(I3));
+title(<span class="string">"Cosine filter on wmax"</span>);
+
+<span class="comment">%L=0.5;</span>
+
+N=size(I,1);
+
+theta = 0:3:177;
+N_theta = length(theta);
+[R,xp] = radon(I,theta);
+
+<span class="comment">% make a Ram-Lak filter. it's just abs(f).</span>
+N1 = length(xp);
+freqs=linspace(-1, 1, N1).';
+myFilter = abs( freqs );
+L=1;
+myFilter( myFilter &gt; L ) = 0;
+myFilter = repmat(myFilter, [1 N_theta]);
+
+<span class="comment">% do my own FT domain filtering</span>
+ft_R = fftshift(fft(R,[],1),1);
+filteredProj = ft_R .* myFilter;
+filteredProj = ifftshift(filteredProj,1);
+ift_R = real(ifft(filteredProj,[],1));
+
+<span class="comment">% tell matlab to do inverse FBP without a filter</span>
+I4 = iradon(ift_R, theta, <span class="string">'linear'</span>, <span class="string">'none'</span>, 1.0, N);
+figure();
+imshow(uint8(I4));
+title(<span class="string">"Ram-Lak filter on wmax/2"</span>)
+
+
+
+
+
+
+<span class="comment">% make a Ram-Lak filter. it's just abs(f).</span>
+N1 = length(xp);
+freqs=linspace(-1, 1, N1).';
+myFilter = 2*L*abs(sin(pi*freqs/(2*L)))/pi;
+
+myFilter( myFilter &gt; L ) = 0;
+myFilter = repmat(myFilter, [1 N_theta]);
+
+<span class="comment">% do my own FT domain filtering</span>
+ft_R = fftshift(fft(R,[],1),1);
+filteredProj = ft_R .* myFilter;
+filteredProj = ifftshift(filteredProj,1);
+ift_R = real(ifft(filteredProj,[],1));
+
+<span class="comment">% tell matlab to do inverse FBP without a filter</span>
+I5 = iradon(ift_R, theta, <span class="string">'linear'</span>, <span class="string">'none'</span>, 1.0, N);
+figure();
+imshow(uint8(I5));
+title(<span class="string">"Shepp-Logan filter on wmax/2"</span>)
+
+N1 = length(xp);
+freqs=linspace(-1, 1, N1).';
+myFilter = abs(freqs).*cos(pi*freqs/(2*L));
+
+myFilter( myFilter &gt; L ) = 0;
+myFilter = repmat(myFilter, [1 N_theta]);
+
+<span class="comment">% do my own FT domain filtering</span>
+ft_R = fftshift(fft(R,[],1),1);
+filteredProj = ft_R .* myFilter;
+filteredProj = ifftshift(filteredProj,1);
+ift_R = real(ifft(filteredProj,[],1));
+
+<span class="comment">% tell matlab to do inverse FBP without a filter</span>
+I6 = iradon(ift_R, theta, <span class="string">'linear'</span>, <span class="string">'none'</span>, 1.0, N);
+figure();
+imshow(uint8(I6));
+title(<span class="string">"cosine filter on wmax/2"</span>)
+
+fprintf(<span class="string">"Cosine is the best filter for wmax and Shepp-Logan is "</span> + <span class="keyword">...</span>
+    <span class="string">"the best filter for wmax/2. \n"</span>)
+fprintf(<span class="string">"This has been reported based on RRMSE values.\n"</span>)
+
+
+clear <span class="string">all</span>;
+
+
+S0=double(imread(<span class="string">'SheppLogan256.png'</span>));
+imshow(uint8(S0));
+figure();
+S1=imgaussfilt(S0,1);
+S5=imgaussfilt(S0,5);
+theta = 0:3:177;
+N_theta = length(theta);
+[RR0, xp0]=radon(S0, theta);
+[RR1, xp1]=radon(S1, theta);
+[RR5, xp5]=radon(S5, theta);
+imshow(uint8(S1));
+figure();
+imshow(uint8(S5));
+figure();
+N=size(S0,1);
+
+
+
+
+N1 = length(xp0);
+freqs=linspace(-1, 1, N1).';
+myFilter = abs( freqs );
+L=1;
+myFilter( myFilter &gt; 1 ) = 0;
+myFilter = repmat(myFilter, [1 N_theta]);
+
+<span class="comment">% do my own FT domain filtering</span>
+ft_R = fftshift(fft(RR0,[],1),1);
+filteredProj = ft_R .* myFilter;
+filteredProj = ifftshift(filteredProj,1);
+ift_R = real(ifft(filteredProj,[],1));
+
+R0 = iradon(ift_R, theta, <span class="string">'linear'</span>, <span class="string">'none'</span>, 1.0, N);
+imshow(uint8(R0));
+figure();
+
+ft_R = fftshift(fft(RR1,[],1),1);
+filteredProj = ft_R .* myFilter;
+filteredProj = ifftshift(filteredProj,1);
+ift_R = real(ifft(filteredProj,[],1));
+
+R1 = iradon(ift_R, theta, <span class="string">'linear'</span>, <span class="string">'none'</span>, 1.0, N);
+imshow(uint8(R1));
+figure();
+
+
+
+ft_R = fftshift(fft(RR5,[],1),1);
+filteredProj = ft_R .* myFilter;
+filteredProj = ifftshift(filteredProj,1);
+ift_R = real(ifft(filteredProj,[],1));
+
+R5 = iradon(ift_R, theta, <span class="string">'linear'</span>, <span class="string">'none'</span>, 1.0, N);
+imshow(uint8(R5));
+figure();
+
+x0=rrmse(S0, R0);
+fprintf(<span class="string">"\nRRMSE between S0 and R0 is "</span>+x0);
+
+x1=rrmse(S1, R1);
+fprintf(<span class="string">"\nRRMSE between S1 and R1 is "</span>+x1);
+x5=rrmse(S5, R5);
+fprintf(<span class="string">"\nRRMSE between S5 and R5 is "</span>+x5);
+
+fprintf(<span class="string">"RRMSE is least for S5 and R5"</span>);
+
+fprintf(<span class="string">"Signal to noise ratio of image is reduced "</span>+<span class="keyword">...</span>
+    <span class="string">"along with background noise \n"</span>+<span class="keyword">...</span>
+    <span class="string">"due to Gaussian filtering and contrast improves.\n"</span>+<span class="keyword">...</span>
+    <span class="string">"Due to this, an image filtered using Gaussian "</span>+<span class="keyword">...</span>
+    <span class="string">"filtering with high standard deviation "</span>+<span class="keyword">...</span>
+    <span class="string">"(S5) has lesser noise than the original and this accounts "</span>+<span class="keyword">...</span>
+    <span class="string">"for the low RRMSE value.\nSo it is better reconstructed "</span>+<span class="keyword">...</span>
+    <span class="string">"undr a filter which is sensitive to noise "</span>+<span class="keyword">...</span>
+    <span class="string">"like the Ram-Lak filter."</span>);
+</pre><pre class="codeoutput">Cosine is the best filter for wmax and Shepp-Logan is the best filter for wmax/2. 
+This has been reported based on RRMSE values.
+
+RRMSE between S0 and R0 is 0.32697
+RRMSE between S1 and R1 is 0.20792
+RRMSE between S5 and R5 is 0.20129RRMSE is least for S5 and R5Signal to noise ratio of image is reduced along with background noise 
+due to Gaussian filtering and contrast improves.
+Due to this, an image filtered using Gaussian filtering with high standard deviation (S5) has lesser noise than the original and this accounts for the low RRMSE value.
+So it is better reconstructed undr a filter which is sensitive to noise like the Ram-Lak filter.</pre><img vspace="5" hspace="5" src="./Q1_files/Q1_01.png" alt=""> <img vspace="5" hspace="5" src="./Q1_files/Q1_02.png" alt=""> <img vspace="5" hspace="5" src="./Q1_files/Q1_03.png" alt=""> <img vspace="5" hspace="5" src="./Q1_files/Q1_04.png" alt=""> <img vspace="5" hspace="5" src="./Q1_files/Q1_05.png" alt=""> <img vspace="5" hspace="5" src="./Q1_files/Q1_06.png" alt=""> <img vspace="5" hspace="5" src="./Q1_files/Q1_07.png" alt=""> <img vspace="5" hspace="5" src="./Q1_files/Q1_08.png" alt=""> <img vspace="5" hspace="5" src="./Q1_files/Q1_09.png" alt=""> <img vspace="5" hspace="5" src="./Q1_files/Q1_10.png" alt=""> <img vspace="5" hspace="5" src="./Q1_files/Q1_11.png" alt=""> <img vspace="5" hspace="5" src="./Q1_files/Q1_12.png" alt=""> <img vspace="5" hspace="5" src="./Q1_files/Q1_13.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB® R2020a</a><br></p></div><!--
+##### SOURCE BEGIN #####
+close all;
+clear all;
+
+I=double(imread('SheppLogan256.png'));
+
+
+N=size(I,1);
+
+theta = 0:3:177;
+N_theta = length(theta);
+[R,xp] = radon(I,theta);
+
+I0=iradon(R, theta);
+figure();
+imshow(uint8(I0));
+title("Normal Back Propagation");
+
+% make a Ram-Lak filter. it's just abs(f).
+N1 = length(xp);
+freqs=linspace(-1, 1, N1).';
+myFilter = abs( freqs );
+L=1;
+myFilter( myFilter > 1 ) = 0;
+myFilter = repmat(myFilter, [1 N_theta]);
+
+% do my own FT domain filtering
+ft_R = fftshift(fft(R,[],1),1);
+filteredProj = ft_R .* myFilter;
+filteredProj = ifftshift(filteredProj,1);
+ift_R = real(ifft(filteredProj,[],1));
+
+% tell matlab to do inverse FBP without a filter
+I1 = iradon(ift_R, theta, 'linear', 'none', 1.0, N);
+figure();
+imshow(uint8(I1));
+title("Ram-Lak filter on wmax");
+
+
+
+% make a Ram-Lak filter. it's just abs(f).
+N1 = length(xp);
+freqs=linspace(-1, 1, N1).';
+myFilter = 2*L*abs(sin(pi*freqs/(2*L)))/pi;
+
+myFilter( myFilter > 1 ) = 0;
+myFilter = repmat(myFilter, [1 N_theta]);
+
+% do my own FT domain filtering
+ft_R = fftshift(fft(R,[],1),1);
+filteredProj = ft_R .* myFilter;
+filteredProj = ifftshift(filteredProj,1);
+ift_R = real(ifft(filteredProj,[],1));
+
+% tell matlab to do inverse FBP without a filter
+I2 = iradon(ift_R, theta, 'linear', 'none', 1.0, N);
+figure();
+imshow(uint8(I2));
+title("Shepp-Logan filter on wmax")
+
+N1 = length(xp);
+freqs=linspace(-1, 1, N1).';
+myFilter = abs(freqs).*cos(pi*freqs/(2*L));
+
+myFilter( myFilter > 1 ) = 0;
+myFilter = repmat(myFilter, [1 N_theta]);
+
+% do my own FT domain filtering
+ft_R = fftshift(fft(R,[],1),1);
+filteredProj = ft_R .* myFilter;
+filteredProj = ifftshift(filteredProj,1);
+ift_R = real(ifft(filteredProj,[],1));
+
+% tell matlab to do inverse FBP without a filter
+I3 = iradon(ift_R, theta, 'linear', 'none', 1.0, N);
+figure();
+imshow(uint8(I3));
+title("Cosine filter on wmax");
+
+%L=0.5;
+
+N=size(I,1);
+
+theta = 0:3:177;
+N_theta = length(theta);
+[R,xp] = radon(I,theta);
+
+% make a Ram-Lak filter. it's just abs(f).
+N1 = length(xp);
+freqs=linspace(-1, 1, N1).';
+myFilter = abs( freqs );
+L=1;
+myFilter( myFilter > L ) = 0;
+myFilter = repmat(myFilter, [1 N_theta]);
+
+% do my own FT domain filtering
+ft_R = fftshift(fft(R,[],1),1);
+filteredProj = ft_R .* myFilter;
+filteredProj = ifftshift(filteredProj,1);
+ift_R = real(ifft(filteredProj,[],1));
+
+% tell matlab to do inverse FBP without a filter
+I4 = iradon(ift_R, theta, 'linear', 'none', 1.0, N);
+figure();
+imshow(uint8(I4));
+title("Ram-Lak filter on wmax/2")
+
+
+
+
+
+
+% make a Ram-Lak filter. it's just abs(f).
+N1 = length(xp);
+freqs=linspace(-1, 1, N1).';
+myFilter = 2*L*abs(sin(pi*freqs/(2*L)))/pi;
+
+myFilter( myFilter > L ) = 0;
+myFilter = repmat(myFilter, [1 N_theta]);
+
+% do my own FT domain filtering
+ft_R = fftshift(fft(R,[],1),1);
+filteredProj = ft_R .* myFilter;
+filteredProj = ifftshift(filteredProj,1);
+ift_R = real(ifft(filteredProj,[],1));
+
+% tell matlab to do inverse FBP without a filter
+I5 = iradon(ift_R, theta, 'linear', 'none', 1.0, N);
+figure();
+imshow(uint8(I5));
+title("Shepp-Logan filter on wmax/2")
+
+N1 = length(xp);
+freqs=linspace(-1, 1, N1).';
+myFilter = abs(freqs).*cos(pi*freqs/(2*L));
+
+myFilter( myFilter > L ) = 0;
+myFilter = repmat(myFilter, [1 N_theta]);
+
+% do my own FT domain filtering
+ft_R = fftshift(fft(R,[],1),1);
+filteredProj = ft_R .* myFilter;
+filteredProj = ifftshift(filteredProj,1);
+ift_R = real(ifft(filteredProj,[],1));
+
+% tell matlab to do inverse FBP without a filter
+I6 = iradon(ift_R, theta, 'linear', 'none', 1.0, N);
+figure();
+imshow(uint8(I6));
+title("cosine filter on wmax/2")
+
+fprintf("Cosine is the best filter for wmax and Shepp-Logan is " + ...
+    "the best filter for wmax/2. \n")
+fprintf("This has been reported based on RRMSE values.\n")
+
+
+clear all;
+
+
+S0=double(imread('SheppLogan256.png'));
+imshow(uint8(S0));
+figure();
+S1=imgaussfilt(S0,1);
+S5=imgaussfilt(S0,5);
+theta = 0:3:177;
+N_theta = length(theta);
+[RR0, xp0]=radon(S0, theta);
+[RR1, xp1]=radon(S1, theta);
+[RR5, xp5]=radon(S5, theta);
+imshow(uint8(S1));
+figure();
+imshow(uint8(S5));
+figure();
+N=size(S0,1);
+
+
+
+
+N1 = length(xp0);
+freqs=linspace(-1, 1, N1).';
+myFilter = abs( freqs );
+L=1;
+myFilter( myFilter > 1 ) = 0;
+myFilter = repmat(myFilter, [1 N_theta]);
+
+% do my own FT domain filtering
+ft_R = fftshift(fft(RR0,[],1),1);
+filteredProj = ft_R .* myFilter;
+filteredProj = ifftshift(filteredProj,1);
+ift_R = real(ifft(filteredProj,[],1));
+
+R0 = iradon(ift_R, theta, 'linear', 'none', 1.0, N);
+imshow(uint8(R0));
+figure();
+
+ft_R = fftshift(fft(RR1,[],1),1);
+filteredProj = ft_R .* myFilter;
+filteredProj = ifftshift(filteredProj,1);
+ift_R = real(ifft(filteredProj,[],1));
+
+R1 = iradon(ift_R, theta, 'linear', 'none', 1.0, N);
+imshow(uint8(R1));
+figure();
+
+
+
+ft_R = fftshift(fft(RR5,[],1),1);
+filteredProj = ft_R .* myFilter;
+filteredProj = ifftshift(filteredProj,1);
+ift_R = real(ifft(filteredProj,[],1));
+
+R5 = iradon(ift_R, theta, 'linear', 'none', 1.0, N);
+imshow(uint8(R5));
+figure();
+
+x0=rrmse(S0, R0);
+fprintf("\nRRMSE between S0 and R0 is "+x0);
+
+x1=rrmse(S1, R1);
+fprintf("\nRRMSE between S1 and R1 is "+x1);
+x5=rrmse(S5, R5);
+fprintf("\nRRMSE between S5 and R5 is "+x5);
+
+fprintf("RRMSE is least for S5 and R5");
+
+fprintf("Signal to noise ratio of image is reduced "+...
+    "along with background noise \n"+...
+    "due to Gaussian filtering and contrast improves.\n"+...
+    "Due to this, an image filtered using Gaussian "+...
+    "filtering with high standard deviation "+...
+    "(S5) has lesser noise than the original and this accounts "+...
+    "for the low RRMSE value.\nSo it is better reconstructed "+...
+    "undr a filter which is sensitive to noise "+...
+    "like the Ram-Lak filter.");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+##### SOURCE END #####
+--></body></html>
