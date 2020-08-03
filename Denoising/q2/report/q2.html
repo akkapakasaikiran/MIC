@@ -1,0 +1,811 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- saved from url=(0075)https://matlab.mathworks.com/users/mwa0000017355334/Published/q2/index.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>q2</title><meta name="generator" content="MATLAB 9.7"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-02-23"><meta name="DC.source" content="q2.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput">close <span class="string">all</span>;
+clear <span class="string">all</span>;
+
+
+fprintf([<span class="string">'\n \n \n We are separating the components r, g, b and running the code on each of them separately because '</span> <span class="keyword">...</span>
+    <span class="string">' \n we cant assume them dependent on each other, and finally combining them to obtain the final images'</span>]);
+noiseless = double(imread(<span class="string">"histology_noiseless.png"</span>));
+noiseless1=noiseless(:, :, 1);
+noiseless2=noiseless(:, :, 2);
+noiseless3=noiseless(:, :, 3);
+Y = double(imread(<span class="string">"histology_noisy.png"</span>));
+Y1=Y(:, :, 1); <span class="comment">% red</span>
+Y2=Y(:, :, 2); <span class="comment">% green</span>
+Y3=Y(:, :, 3); <span class="comment">% blue</span>
+
+o1=rrmse(noiseless1, Y1);
+o2=rrmse(noiseless2, Y2);
+o3=rrmse(noiseless3, Y3);
+
+
+[Y11, f1] = graddesc(Y1, @quadratic, 0.8, 1);
+[Y111, a1] = graddesc(Y1, @quadratic, 0.64, 1);
+[Y112, a2] = graddesc(Y1, @quadratic, 0.96, 1);
+[Y113, a3] = graddesc(Y1, @quadratic, 0.8, 1.2);
+[Y114, a4] = graddesc(Y1, @quadratic, 0.8, 0.8);
+
+rq=rrmse(Y11, noiseless1);
+rq2=rrmse(Y111, noiseless1);
+rq3=rrmse(Y112, noiseless1);
+rq4=rrmse(Y113, noiseless1);
+rq5=rrmse(Y114, noiseless1);
+
+[Y12, f2] = graddesc(Y1, @huber, 0.9, 8);
+[Y121, b1] = graddesc(Y1, @huber, 0.72, 8);
+[Y122, b2] = graddesc(Y1, @huber, 0.98, 8);
+[Y123, b3] = graddesc(Y1, @huber, 0.9, 6.4);
+[Y124, b4] = graddesc(Y1, @huber, 0.9, 9.6);
+
+
+
+rh=rrmse(Y12, noiseless1);
+rh2=rrmse(Y121, noiseless1);
+rh3=rrmse(Y122, noiseless1);
+rh4=rrmse(Y123, noiseless1);
+rh5=rrmse(Y124, noiseless1);
+
+[Y13, f3] = graddesc(Y1, @thirdfunc, 0.9, 11);
+[Y131, c1] = graddesc(Y1, @thirdfunc, 0.72, 11);
+[Y132, c2] = graddesc(Y1, @thirdfunc, 0.98, 11);
+[Y133, c3] = graddesc(Y1, @thirdfunc, 0.9, 8.8);
+[Y134, c4] = graddesc(Y1, @thirdfunc, 0.9, 13.2);
+
+rt=rrmse(Y13, noiseless1);
+rt2=rrmse(Y131, noiseless1);
+rt3=rrmse(Y132, noiseless1);
+rt4=rrmse(Y133, noiseless1);
+rt5=rrmse(Y134, noiseless1);
+
+[Y21, f4] = graddesc(Y2, @quadratic, 0.7, 1);
+[Y211, d1] = graddesc(Y2, @quadratic, 0.56, 1);
+[Y212, d2] = graddesc(Y2, @quadratic, 0.84, 1);
+[Y213, d3] = graddesc(Y2, @quadratic, 0.7, 0.8);
+[Y214, d4] = graddesc(Y2, @quadratic, 0.7, 1.2);
+
+gq=rrmse(Y21, noiseless2);
+gq2=rrmse(Y211, noiseless2);
+gq3=rrmse(Y212, noiseless2);
+gq4=rrmse(Y213, noiseless2);
+gq5=rrmse(Y214, noiseless2);
+
+[Y22, f5] = graddesc(Y2, @huber, 0.8, 9);
+[Y221, e1] = graddesc(Y2, @huber, 0.64, 9);
+[Y222, e2] = graddesc(Y2, @huber, 0.96, 9);
+[Y223, e3] = graddesc(Y2, @huber, 0.8, 7.2);
+[Y224, e4] = graddesc(Y2, @huber, 0.8, 10.8);
+
+gh=rrmse(Y22, noiseless2);
+gh2=rrmse(Y221, noiseless2);
+gh3=rrmse(Y222, noiseless2);
+gh4=rrmse(Y223, noiseless2);
+gh5=rrmse(Y224, noiseless2);
+
+[Y23, f6] = graddesc(Y2, @thirdfunc, 0.9, 7);
+[Y231, g1] = graddesc(Y2, @thirdfunc, 0.72, 7);
+[Y232, g2] = graddesc(Y2, @thirdfunc, 0.98, 7);
+[Y233, g3] = graddesc(Y2, @thirdfunc, 0.9, 8.4);
+[Y234, g4] = graddesc(Y2, @thirdfunc, 0.9, 5.6);
+
+gt=rrmse(Y23, noiseless2);
+gt2=rrmse(Y231, noiseless2);
+gt3=rrmse(Y232, noiseless2);
+gt4=rrmse(Y233, noiseless2);
+gt5=rrmse(Y234, noiseless2);
+
+[Y31, f7] = graddesc(Y3, @quadratic, 0.8, 1);
+[Y311, h1] = graddesc(Y3, @quadratic, 0.64, 1);
+[Y312, h2] = graddesc(Y3, @quadratic, 0.96, 1);
+[Y313, h3] = graddesc(Y3, @quadratic, 0.8, 0.8);
+[Y314, h4] = graddesc(Y3, @quadratic, 0.8, 1.2);
+
+bq=rrmse(Y31, noiseless3);
+bq2=rrmse(Y311, noiseless3);
+bq3=rrmse(Y312, noiseless3);
+bq4=rrmse(Y313, noiseless3);
+bq5=rrmse(Y314, noiseless3);
+
+[Y32, f8] = graddesc(Y3, @huber, 0.9, 9);
+[Y321, i1] = graddesc(Y3, @huber, 0.72, 9);
+[Y322, i2] = graddesc(Y3, @huber, 0.98, 9);
+[Y323, i3] = graddesc(Y3, @huber, 0.9, 7.2);
+[Y324, i4] = graddesc(Y3, @huber, 0.9, 10.8);
+
+bh=rrmse(Y32, noiseless3);
+bh2=rrmse(Y321, noiseless3);
+bh3=rrmse(Y322, noiseless3);
+bh4=rrmse(Y323, noiseless3);
+bh5=rrmse(Y324, noiseless3);
+
+[Y33, f9] = graddesc(Y3, @thirdfunc, 0.9, 17);
+[Y331, j1] = graddesc(Y3, @thirdfunc, 0.72, 17);
+[Y332, j2] = graddesc(Y3, @thirdfunc, 0.98, 17);
+[Y333, j3] = graddesc(Y3, @thirdfunc, 0.9, 13.6);
+[Y334, j4] = graddesc(Y3, @thirdfunc, 0.9, 20.4);
+
+bt=rrmse(Y33, noiseless3);
+bt2=rrmse(Y331, noiseless3);
+bt3=rrmse(Y332, noiseless3);
+bt4=rrmse(Y333, noiseless3);
+bt5=rrmse(Y334, noiseless3);
+
+Yq(:, :, 1) = Y11;
+Yq(:, :, 2) = Y21;
+Yq(:, :, 3) = Y31;
+
+Yh(:, :, 1) = Y12;
+Yh(:, :, 2) = Y22;
+Yh(:, :, 3) = Y32;
+
+Yt(:, :, 1) = Y13;
+Yt(:, :, 2) = Y23;
+Yt(:, :, 3) = Y33;
+
+mat=[o1, o2, o3;
+    rq, gq, bq;
+    rh, gh, bh;
+    rt, gt, bt];
+
+mat2=[o1, o2, o3;
+    rq2, gq2, bq2;
+    rh2, gh2, bh2;
+    rt2, gt2, bt2];
+
+mat3=[o1, o2, o3;
+    rq3, gq3, bq3;
+    rh3, gh3, bh3;
+    rt3, gt3, bt3];
+
+mat4=[o1, o2, o3;
+    rq4, gq4, bq4;
+    rh4, gh4, bh4;
+    rt4, gt4, bt4];
+
+mat5=[o1, o2, o3;
+    rq5, gq5, bq5;
+    rh5, gh5, bh5;
+    rt5, gt5, bt5];
+
+
+fprintf(<span class="string">'\n \n \n Denoising Red Color Using Quadratic Prior'</span>);
+fprintf(strcat(<span class="string">'\n Optimal Alpha = '</span>,num2str(0.8)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha) = '</span>,num2str(rq)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*0.8) = '</span>, num2str(rq2)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*1.2) = '</span>, num2str(rq3)));
+
+fprintf(<span class="string">'\n \n \n Denoising Green Color Using Quadratic Prior'</span>);
+fprintf(strcat(<span class="string">'\n Optimal Alpha = '</span>,num2str(0.7)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha) = '</span>,num2str(gq)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*0.8) = '</span>, num2str(gq2)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*1.2) = '</span>, num2str(gq3)));
+
+fprintf(<span class="string">'\n \n \n Denoising Blue Color Using Quadratic Prior'</span>);
+fprintf(strcat(<span class="string">'\n Optimal Alpha = '</span>,num2str(0.9)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha) = '</span>,num2str(bq)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*0.8) = '</span>, num2str(bq2)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*1.2) = '</span>, num2str(bq3)));
+
+fprintf(<span class="string">'\n \n Denoising Red Color Using Huber Prior'</span>);
+fprintf(strcat(<span class="string">'\n Optimal Alpha = '</span>,num2str(0.9)));
+fprintf(strcat(<span class="string">'\n Optimal Gamma = '</span>,num2str(8)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,Gamma) = '</span>,num2str(rh)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*0.8,Gamma) = '</span>, num2str(rh2)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*1.2,Gamma) = '</span>, num2str(rh3)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,0.8*Gamma) = '</span>, num2str(rh4)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,1.2*Gamma) = '</span>, num2str(rh5)));
+
+fprintf(<span class="string">'\n \n Denoising Green Color Using Huber Prior'</span>);
+fprintf(strcat(<span class="string">'\n Optimal Alpha = '</span>,num2str(0.8)));
+fprintf(strcat(<span class="string">'\n Optimal Gamma = '</span>,num2str(9)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,Gamma) = '</span>,num2str(gh)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*0.8,Gamma) = '</span>, num2str(gh2)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*1.2,Gamma) = '</span>, num2str(gh3)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,0.8*Gamma) = '</span>, num2str(gh4)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,1.2*Gamma) = '</span>, num2str(gh5)));
+
+fprintf(<span class="string">'\n \n Denoising Blue Color Using Huber Prior'</span>);
+fprintf(strcat(<span class="string">'\n Optimal Alpha = '</span>,num2str(0.9)));
+fprintf(strcat(<span class="string">'\n Optimal Gamma = '</span>,num2str(9)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,Gamma) = '</span>,num2str(bh)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*0.8,Gamma) = '</span>, num2str(bh2)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*1.2,Gamma) = '</span>, num2str(bh3)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,0.8*Gamma) = '</span>, num2str(bh4)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,1.2*Gamma) = '</span>, num2str(bh5)));
+
+fprintf(<span class="string">'\n \n Denoising Red Color Using thirdfunc Prior'</span>);
+fprintf(strcat(<span class="string">'\n Optimal Alpha = '</span>,num2str(0.9)));
+fprintf(strcat(<span class="string">'\n Optimal Gamma = '</span>,num2str(11)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,Gamma) = '</span>,num2str(bh)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*0.8,Gamma) = '</span>, num2str(bh2)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*1.2,Gamma) = '</span>, num2str(bh3)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,0.8*Gamma) = '</span>, num2str(bh4)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,1.2*Gamma) = '</span>, num2str(bh5)));
+
+fprintf(<span class="string">'\n \n Denoising Green Color Using thirdfunc Prior'</span>);
+fprintf(strcat(<span class="string">'\n Optimal Alpha = '</span>,num2str(0.9)));
+fprintf(strcat(<span class="string">'\n Optimal Gamma = '</span>,num2str(7)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,Gamma) = '</span>,num2str(bh)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*0.8,Gamma) = '</span>, num2str(bh2)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*1.2,Gamma) = '</span>, num2str(bh3)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,0.8*Gamma) = '</span>, num2str(bh4)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,1.2*Gamma) = '</span>, num2str(bh5)));
+
+fprintf(<span class="string">'\n \n Denoising Blue Color Using thirdfunc Prior'</span>);
+fprintf(strcat(<span class="string">'\n Optimal Alpha = '</span>,num2str(0.9)));
+fprintf(strcat(<span class="string">'\n Optimal Gamma = '</span>,num2str(17)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,Gamma) = '</span>,num2str(bh)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*0.8,Gamma) = '</span>, num2str(bh2)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*1.2,Gamma) = '</span>, num2str(bh3)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,0.8*Gamma) = '</span>, num2str(bh4)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,1.2*Gamma) = '</span>, num2str(bh5)));
+
+
+
+
+
+
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (Y/255)); <span class="comment">% phantom is a popular test image</span>
+colormap (myColorScale);
+colormap <span class="string">jet</span>;
+daspect ([1 1 1]);
+axis <span class="string">tight</span>;
+colorbar
+
+figure()
+
+ myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+ imagesc (single (noiseless/255)); <span class="comment">% phantom is a popular test image</span>
+ colormap (myColorScale);
+ colormap <span class="string">jet</span>;
+ daspect ([1 1 1]);
+ axis <span class="string">tight</span>;
+ colorbar
+
+ figure()
+
+ myColorScale = [ [0:1/(myNumOfColors-1):1]' ,  [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+ imagesc (single (Yq/255)); <span class="comment">% phantom is a popular test image</span>
+ colormap (myColorScale);
+ colormap <span class="string">jet</span>;
+ daspect ([1 1 1]);
+ axis <span class="string">tight</span>;
+ colorbar
+
+figure()
+
+ myColorScale = [ [0:1/(myNumOfColors-1):1]' ,  [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+ imagesc (single (Yh/255)); <span class="comment">% phantom is a popular test image</span>
+ colormap (myColorScale);
+ colormap <span class="string">jet</span>;
+ daspect ([1 1 1]);
+ axis <span class="string">tight</span>;
+ colorbar
+
+ figure()
+
+
+ myColorScale = [ [0:1/(myNumOfColors-1):1]' ,  [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+ imagesc (single (Yt/255)); <span class="comment">% phantom is a popular test image</span>
+ colormap (myColorScale);
+ colormap <span class="string">jet</span>;
+ daspect ([1 1 1]);
+ axis <span class="string">tight</span>;
+ colorbar
+
+figure(); plot(f1);
+title(<span class="string">'Cost function for quadratic denoising for red color'</span>,<span class="string">'FontSize'</span>, 9);
+xlabel(<span class="string">'Number of iterations'</span>); ylabel(<span class="string">'Cost function'</span>);
+
+figure(); plot(f2);
+title(<span class="string">'Cost function for huber denoising for red color'</span>,<span class="string">'FontSize'</span>, 9);
+xlabel(<span class="string">'Number of iterations'</span>); ylabel(<span class="string">'Cost function'</span>);
+
+figure(); plot(f3);
+title(<span class="string">'Cost function for thirdfunc denoising for red color'</span>,<span class="string">'FontSize'</span>, 9);
+xlabel(<span class="string">'Number of iterations'</span>); ylabel(<span class="string">'Cost function'</span>);
+
+figure(); plot(f4);
+title(<span class="string">'Cost function for quadratic denoising for green color'</span>,<span class="string">'FontSize'</span>, 9);
+xlabel(<span class="string">'Number of iterations'</span>); ylabel(<span class="string">'Cost function'</span>);
+
+figure(); plot(f5);
+title(<span class="string">'Cost function for huber denoising for green color'</span>,<span class="string">'FontSize'</span>, 9);
+xlabel(<span class="string">'Number of iterations'</span>); ylabel(<span class="string">'Cost function'</span>);
+
+figure(); plot(f6);
+title(<span class="string">'Cost function for thirdfunc denoising for green color'</span>,<span class="string">'FontSize'</span>, 9);
+xlabel(<span class="string">'Number of iterations'</span>); ylabel(<span class="string">'Cost function'</span>);
+
+figure(); plot(f7);
+title(<span class="string">'Cost function for quadratic denoising for blue color'</span>,<span class="string">'FontSize'</span>, 9);
+xlabel(<span class="string">'Number of iterations'</span>); ylabel(<span class="string">'Cost function'</span>);
+
+figure(); plot(f8);
+title(<span class="string">'Cost function for huber denoising for blue color'</span>,<span class="string">'FontSize'</span>, 9);
+xlabel(<span class="string">'Number of iterations'</span>); ylabel(<span class="string">'Cost function'</span>);
+
+figure(); plot(f9);
+title(<span class="string">'Cost function for thirdfunc denoising for blue color'</span>,<span class="string">'FontSize'</span>, 9);
+xlabel(<span class="string">'Number of iterations'</span>); ylabel(<span class="string">'Cost function'</span>);
+</pre><pre class="codeoutput"> 
+ 
+ We are separating the components r, g, b and running the code on each of them separately because  
+ we cant assume them dependent on each other, and finally combining them to obtain the final images
+ 
+ 
+ Denoising Red Color Using Quadratic Prior
+ Optimal Alpha =0.8
+ RRMSE(alpha) =0.046625
+ RRMSE(alpha*0.8) =0.05403
+ RRMSE(alpha*1.2) =0.087327
+ 
+ 
+ Denoising Green Color Using Quadratic Prior
+ Optimal Alpha =0.7
+ RRMSE(alpha) =0.066439
+ RRMSE(alpha*0.8) =0.074581
+ RRMSE(alpha*1.2) =0.094062
+ 
+ 
+ Denoising Blue Color Using Quadratic Prior
+ Optimal Alpha =0.9
+ RRMSE(alpha) =0.043691
+ RRMSE(alpha*0.8) =0.055392
+ RRMSE(alpha*1.2) =0.068817
+ 
+ Denoising Red Color Using Huber Prior
+ Optimal Alpha =0.9
+ Optimal Gamma =8
+ RRMSE(alpha,Gamma) =0.046447
+ RRMSE(alpha*0.8,Gamma) =0.074765
+ RRMSE(alpha*1.2,Gamma) =0.087899
+ RRMSE(alpha,0.8*Gamma) =0.045754
+ RRMSE(alpha,1.2*Gamma) =0.047218
+ 
+ Denoising Green Color Using Huber Prior
+ Optimal Alpha =0.8
+ Optimal Gamma =9
+ RRMSE(alpha,Gamma) =0.072755
+ RRMSE(alpha*0.8,Gamma) =0.10494
+ RRMSE(alpha*1.2,Gamma) =0.13203
+ RRMSE(alpha,0.8*Gamma) =0.077144
+ RRMSE(alpha,1.2*Gamma) =0.07021
+ 
+ Denoising Blue Color Using Huber Prior
+ Optimal Alpha =0.9
+ Optimal Gamma =9
+ RRMSE(alpha,Gamma) =0.043387
+ RRMSE(alpha*0.8,Gamma) =0.073104
+ RRMSE(alpha*1.2,Gamma) =0.070257
+ RRMSE(alpha,0.8*Gamma) =0.043582
+ RRMSE(alpha,1.2*Gamma) =0.043463
+ 
+ Denoising Red Color Using thirdfunc Prior
+ Optimal Alpha =0.9
+ Optimal Gamma =11
+ RRMSE(alpha,Gamma) =0.043387
+ RRMSE(alpha*0.8,Gamma) =0.073104
+ RRMSE(alpha*1.2,Gamma) =0.070257
+ RRMSE(alpha,0.8*Gamma) =0.043582
+ RRMSE(alpha,1.2*Gamma) =0.043463
+ 
+ Denoising Green Color Using thirdfunc Prior
+ Optimal Alpha =0.9
+ Optimal Gamma =7
+ RRMSE(alpha,Gamma) =0.043387
+ RRMSE(alpha*0.8,Gamma) =0.073104
+ RRMSE(alpha*1.2,Gamma) =0.070257
+ RRMSE(alpha,0.8*Gamma) =0.043582
+ RRMSE(alpha,1.2*Gamma) =0.043463
+ 
+ Denoising Blue Color Using thirdfunc Prior
+ Optimal Alpha =0.9
+ Optimal Gamma =17
+ RRMSE(alpha,Gamma) =0.043387
+ RRMSE(alpha*0.8,Gamma) =0.073104
+ RRMSE(alpha*1.2,Gamma) =0.070257
+ RRMSE(alpha,0.8*Gamma) =0.043582
+ RRMSE(alpha,1.2*Gamma) =0.043463</pre><img vspace="5" hspace="5" src="./q2_files/q2_01.png" alt=""> <img vspace="5" hspace="5" src="./q2_files/q2_02.png" alt=""> <img vspace="5" hspace="5" src="./q2_files/q2_03.png" alt=""> <img vspace="5" hspace="5" src="./q2_files/q2_04.png" alt=""> <img vspace="5" hspace="5" src="./q2_files/q2_05.png" alt=""> <img vspace="5" hspace="5" src="./q2_files/q2_06.png" alt=""> <img vspace="5" hspace="5" src="./q2_files/q2_07.png" alt=""> <img vspace="5" hspace="5" src="./q2_files/q2_08.png" alt=""> <img vspace="5" hspace="5" src="./q2_files/q2_09.png" alt=""> <img vspace="5" hspace="5" src="./q2_files/q2_10.png" alt=""> <img vspace="5" hspace="5" src="./q2_files/q2_11.png" alt=""> <img vspace="5" hspace="5" src="./q2_files/q2_12.png" alt=""> <img vspace="5" hspace="5" src="./q2_files/q2_13.png" alt=""> <img vspace="5" hspace="5" src="./q2_files/q2_14.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB® R2019b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+close all;
+clear all;
+
+
+fprintf(['\n \n \n We are separating the components r, g, b and running the code on each of them separately because ' ...
+    ' \n we cant assume them dependent on each other, and finally combining them to obtain the final images']);
+noiseless = double(imread("histology_noiseless.png"));
+noiseless1=noiseless(:, :, 1);
+noiseless2=noiseless(:, :, 2);
+noiseless3=noiseless(:, :, 3);
+Y = double(imread("histology_noisy.png"));
+Y1=Y(:, :, 1); % red
+Y2=Y(:, :, 2); % green
+Y3=Y(:, :, 3); % blue
+
+o1=rrmse(noiseless1, Y1);
+o2=rrmse(noiseless2, Y2);
+o3=rrmse(noiseless3, Y3);
+
+
+[Y11, f1] = graddesc(Y1, @quadratic, 0.8, 1);
+[Y111, a1] = graddesc(Y1, @quadratic, 0.64, 1);
+[Y112, a2] = graddesc(Y1, @quadratic, 0.96, 1);
+[Y113, a3] = graddesc(Y1, @quadratic, 0.8, 1.2);
+[Y114, a4] = graddesc(Y1, @quadratic, 0.8, 0.8);
+
+rq=rrmse(Y11, noiseless1);
+rq2=rrmse(Y111, noiseless1);
+rq3=rrmse(Y112, noiseless1);
+rq4=rrmse(Y113, noiseless1);
+rq5=rrmse(Y114, noiseless1);
+
+[Y12, f2] = graddesc(Y1, @huber, 0.9, 8);
+[Y121, b1] = graddesc(Y1, @huber, 0.72, 8);
+[Y122, b2] = graddesc(Y1, @huber, 0.98, 8);
+[Y123, b3] = graddesc(Y1, @huber, 0.9, 6.4);
+[Y124, b4] = graddesc(Y1, @huber, 0.9, 9.6);
+
+
+
+rh=rrmse(Y12, noiseless1);
+rh2=rrmse(Y121, noiseless1);
+rh3=rrmse(Y122, noiseless1);
+rh4=rrmse(Y123, noiseless1);
+rh5=rrmse(Y124, noiseless1);
+
+[Y13, f3] = graddesc(Y1, @thirdfunc, 0.9, 11);
+[Y131, c1] = graddesc(Y1, @thirdfunc, 0.72, 11);
+[Y132, c2] = graddesc(Y1, @thirdfunc, 0.98, 11);
+[Y133, c3] = graddesc(Y1, @thirdfunc, 0.9, 8.8);
+[Y134, c4] = graddesc(Y1, @thirdfunc, 0.9, 13.2);
+
+rt=rrmse(Y13, noiseless1);
+rt2=rrmse(Y131, noiseless1);
+rt3=rrmse(Y132, noiseless1);
+rt4=rrmse(Y133, noiseless1);
+rt5=rrmse(Y134, noiseless1);
+
+[Y21, f4] = graddesc(Y2, @quadratic, 0.7, 1);
+[Y211, d1] = graddesc(Y2, @quadratic, 0.56, 1);
+[Y212, d2] = graddesc(Y2, @quadratic, 0.84, 1);
+[Y213, d3] = graddesc(Y2, @quadratic, 0.7, 0.8);
+[Y214, d4] = graddesc(Y2, @quadratic, 0.7, 1.2);
+
+gq=rrmse(Y21, noiseless2);
+gq2=rrmse(Y211, noiseless2);
+gq3=rrmse(Y212, noiseless2);
+gq4=rrmse(Y213, noiseless2);
+gq5=rrmse(Y214, noiseless2);
+
+[Y22, f5] = graddesc(Y2, @huber, 0.8, 9);
+[Y221, e1] = graddesc(Y2, @huber, 0.64, 9);
+[Y222, e2] = graddesc(Y2, @huber, 0.96, 9);
+[Y223, e3] = graddesc(Y2, @huber, 0.8, 7.2);
+[Y224, e4] = graddesc(Y2, @huber, 0.8, 10.8);
+
+gh=rrmse(Y22, noiseless2);
+gh2=rrmse(Y221, noiseless2);
+gh3=rrmse(Y222, noiseless2);
+gh4=rrmse(Y223, noiseless2);
+gh5=rrmse(Y224, noiseless2);
+
+[Y23, f6] = graddesc(Y2, @thirdfunc, 0.9, 7);
+[Y231, g1] = graddesc(Y2, @thirdfunc, 0.72, 7);
+[Y232, g2] = graddesc(Y2, @thirdfunc, 0.98, 7);
+[Y233, g3] = graddesc(Y2, @thirdfunc, 0.9, 8.4);
+[Y234, g4] = graddesc(Y2, @thirdfunc, 0.9, 5.6);
+
+gt=rrmse(Y23, noiseless2);
+gt2=rrmse(Y231, noiseless2);
+gt3=rrmse(Y232, noiseless2);
+gt4=rrmse(Y233, noiseless2);
+gt5=rrmse(Y234, noiseless2);
+
+[Y31, f7] = graddesc(Y3, @quadratic, 0.8, 1);
+[Y311, h1] = graddesc(Y3, @quadratic, 0.64, 1);
+[Y312, h2] = graddesc(Y3, @quadratic, 0.96, 1);
+[Y313, h3] = graddesc(Y3, @quadratic, 0.8, 0.8);
+[Y314, h4] = graddesc(Y3, @quadratic, 0.8, 1.2);
+
+bq=rrmse(Y31, noiseless3);
+bq2=rrmse(Y311, noiseless3);
+bq3=rrmse(Y312, noiseless3);
+bq4=rrmse(Y313, noiseless3);
+bq5=rrmse(Y314, noiseless3);
+
+[Y32, f8] = graddesc(Y3, @huber, 0.9, 9);
+[Y321, i1] = graddesc(Y3, @huber, 0.72, 9);
+[Y322, i2] = graddesc(Y3, @huber, 0.98, 9);
+[Y323, i3] = graddesc(Y3, @huber, 0.9, 7.2);
+[Y324, i4] = graddesc(Y3, @huber, 0.9, 10.8);
+
+bh=rrmse(Y32, noiseless3);
+bh2=rrmse(Y321, noiseless3);
+bh3=rrmse(Y322, noiseless3);
+bh4=rrmse(Y323, noiseless3);
+bh5=rrmse(Y324, noiseless3);
+
+[Y33, f9] = graddesc(Y3, @thirdfunc, 0.9, 17);
+[Y331, j1] = graddesc(Y3, @thirdfunc, 0.72, 17);
+[Y332, j2] = graddesc(Y3, @thirdfunc, 0.98, 17);
+[Y333, j3] = graddesc(Y3, @thirdfunc, 0.9, 13.6);
+[Y334, j4] = graddesc(Y3, @thirdfunc, 0.9, 20.4);
+
+bt=rrmse(Y33, noiseless3);
+bt2=rrmse(Y331, noiseless3);
+bt3=rrmse(Y332, noiseless3);
+bt4=rrmse(Y333, noiseless3);
+bt5=rrmse(Y334, noiseless3);
+
+Yq(:, :, 1) = Y11;
+Yq(:, :, 2) = Y21;
+Yq(:, :, 3) = Y31;
+
+Yh(:, :, 1) = Y12;
+Yh(:, :, 2) = Y22;
+Yh(:, :, 3) = Y32;
+
+Yt(:, :, 1) = Y13;
+Yt(:, :, 2) = Y23;
+Yt(:, :, 3) = Y33;
+
+mat=[o1, o2, o3;
+    rq, gq, bq;
+    rh, gh, bh;
+    rt, gt, bt];
+
+mat2=[o1, o2, o3;
+    rq2, gq2, bq2;
+    rh2, gh2, bh2;
+    rt2, gt2, bt2];
+
+mat3=[o1, o2, o3;
+    rq3, gq3, bq3;
+    rh3, gh3, bh3;
+    rt3, gt3, bt3];
+
+mat4=[o1, o2, o3;
+    rq4, gq4, bq4;
+    rh4, gh4, bh4;
+    rt4, gt4, bt4];
+
+mat5=[o1, o2, o3;
+    rq5, gq5, bq5;
+    rh5, gh5, bh5;
+    rt5, gt5, bt5];
+
+
+fprintf('\n \n \n Denoising Red Color Using Quadratic Prior');
+fprintf(strcat('\n Optimal Alpha = ',num2str(0.8)));
+fprintf(strcat('\n RRMSE(alpha) = ',num2str(rq)));
+fprintf(strcat('\n RRMSE(alpha*0.8) = ', num2str(rq2)));
+fprintf(strcat('\n RRMSE(alpha*1.2) = ', num2str(rq3)));
+
+fprintf('\n \n \n Denoising Green Color Using Quadratic Prior');
+fprintf(strcat('\n Optimal Alpha = ',num2str(0.7)));
+fprintf(strcat('\n RRMSE(alpha) = ',num2str(gq)));
+fprintf(strcat('\n RRMSE(alpha*0.8) = ', num2str(gq2)));
+fprintf(strcat('\n RRMSE(alpha*1.2) = ', num2str(gq3)));
+
+fprintf('\n \n \n Denoising Blue Color Using Quadratic Prior');
+fprintf(strcat('\n Optimal Alpha = ',num2str(0.9)));
+fprintf(strcat('\n RRMSE(alpha) = ',num2str(bq)));
+fprintf(strcat('\n RRMSE(alpha*0.8) = ', num2str(bq2)));
+fprintf(strcat('\n RRMSE(alpha*1.2) = ', num2str(bq3)));
+
+fprintf('\n \n Denoising Red Color Using Huber Prior');
+fprintf(strcat('\n Optimal Alpha = ',num2str(0.9)));
+fprintf(strcat('\n Optimal Gamma = ',num2str(8)));
+fprintf(strcat('\n RRMSE(alpha,Gamma) = ',num2str(rh)));
+fprintf(strcat('\n RRMSE(alpha*0.8,Gamma) = ', num2str(rh2)));
+fprintf(strcat('\n RRMSE(alpha*1.2,Gamma) = ', num2str(rh3)));
+fprintf(strcat('\n RRMSE(alpha,0.8*Gamma) = ', num2str(rh4)));
+fprintf(strcat('\n RRMSE(alpha,1.2*Gamma) = ', num2str(rh5)));
+
+fprintf('\n \n Denoising Green Color Using Huber Prior');
+fprintf(strcat('\n Optimal Alpha = ',num2str(0.8)));
+fprintf(strcat('\n Optimal Gamma = ',num2str(9)));
+fprintf(strcat('\n RRMSE(alpha,Gamma) = ',num2str(gh)));
+fprintf(strcat('\n RRMSE(alpha*0.8,Gamma) = ', num2str(gh2)));
+fprintf(strcat('\n RRMSE(alpha*1.2,Gamma) = ', num2str(gh3)));
+fprintf(strcat('\n RRMSE(alpha,0.8*Gamma) = ', num2str(gh4)));
+fprintf(strcat('\n RRMSE(alpha,1.2*Gamma) = ', num2str(gh5)));
+
+fprintf('\n \n Denoising Blue Color Using Huber Prior');
+fprintf(strcat('\n Optimal Alpha = ',num2str(0.9)));
+fprintf(strcat('\n Optimal Gamma = ',num2str(9)));
+fprintf(strcat('\n RRMSE(alpha,Gamma) = ',num2str(bh)));
+fprintf(strcat('\n RRMSE(alpha*0.8,Gamma) = ', num2str(bh2)));
+fprintf(strcat('\n RRMSE(alpha*1.2,Gamma) = ', num2str(bh3)));
+fprintf(strcat('\n RRMSE(alpha,0.8*Gamma) = ', num2str(bh4)));
+fprintf(strcat('\n RRMSE(alpha,1.2*Gamma) = ', num2str(bh5)));
+
+fprintf('\n \n Denoising Red Color Using thirdfunc Prior');
+fprintf(strcat('\n Optimal Alpha = ',num2str(0.9)));
+fprintf(strcat('\n Optimal Gamma = ',num2str(11)));
+fprintf(strcat('\n RRMSE(alpha,Gamma) = ',num2str(bh)));
+fprintf(strcat('\n RRMSE(alpha*0.8,Gamma) = ', num2str(bh2)));
+fprintf(strcat('\n RRMSE(alpha*1.2,Gamma) = ', num2str(bh3)));
+fprintf(strcat('\n RRMSE(alpha,0.8*Gamma) = ', num2str(bh4)));
+fprintf(strcat('\n RRMSE(alpha,1.2*Gamma) = ', num2str(bh5)));
+
+fprintf('\n \n Denoising Green Color Using thirdfunc Prior');
+fprintf(strcat('\n Optimal Alpha = ',num2str(0.9)));
+fprintf(strcat('\n Optimal Gamma = ',num2str(7)));
+fprintf(strcat('\n RRMSE(alpha,Gamma) = ',num2str(bh)));
+fprintf(strcat('\n RRMSE(alpha*0.8,Gamma) = ', num2str(bh2)));
+fprintf(strcat('\n RRMSE(alpha*1.2,Gamma) = ', num2str(bh3)));
+fprintf(strcat('\n RRMSE(alpha,0.8*Gamma) = ', num2str(bh4)));
+fprintf(strcat('\n RRMSE(alpha,1.2*Gamma) = ', num2str(bh5)));
+
+fprintf('\n \n Denoising Blue Color Using thirdfunc Prior');
+fprintf(strcat('\n Optimal Alpha = ',num2str(0.9)));
+fprintf(strcat('\n Optimal Gamma = ',num2str(17)));
+fprintf(strcat('\n RRMSE(alpha,Gamma) = ',num2str(bh)));
+fprintf(strcat('\n RRMSE(alpha*0.8,Gamma) = ', num2str(bh2)));
+fprintf(strcat('\n RRMSE(alpha*1.2,Gamma) = ', num2str(bh3)));
+fprintf(strcat('\n RRMSE(alpha,0.8*Gamma) = ', num2str(bh4)));
+fprintf(strcat('\n RRMSE(alpha,1.2*Gamma) = ', num2str(bh5)));
+
+
+
+
+
+
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ]; 
+imagesc (single (Y/255)); % phantom is a popular test image
+colormap (myColorScale);
+colormap jet;
+daspect ([1 1 1]);
+axis tight;
+colorbar
+
+figure()
+ 
+ myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+ imagesc (single (noiseless/255)); % phantom is a popular test image 
+ colormap (myColorScale);
+ colormap jet;
+ daspect ([1 1 1]);
+ axis tight;
+ colorbar
+ 
+ figure()
+ 
+ myColorScale = [ [0:1/(myNumOfColors-1):1]' ,  [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ]; 
+ imagesc (single (Yq/255)); % phantom is a popular test image 
+ colormap (myColorScale);
+ colormap jet;
+ daspect ([1 1 1]);
+ axis tight;
+ colorbar
+ 
+figure()
+ 
+ myColorScale = [ [0:1/(myNumOfColors-1):1]' ,  [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ]; 
+ imagesc (single (Yh/255)); % phantom is a popular test image
+ colormap (myColorScale);
+ colormap jet;
+ daspect ([1 1 1]);
+ axis tight;
+ colorbar
+ 
+ figure()
+ 
+ 
+ myColorScale = [ [0:1/(myNumOfColors-1):1]' ,  [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ]; 
+ imagesc (single (Yt/255)); % phantom is a popular test image 
+ colormap (myColorScale);
+ colormap jet;
+ daspect ([1 1 1]);
+ axis tight;
+ colorbar
+ 
+figure(); plot(f1);
+title('Cost function for quadratic denoising for red color','FontSize', 9);
+xlabel('Number of iterations'); ylabel('Cost function');
+
+figure(); plot(f2);
+title('Cost function for huber denoising for red color','FontSize', 9);
+xlabel('Number of iterations'); ylabel('Cost function');
+
+figure(); plot(f3);
+title('Cost function for thirdfunc denoising for red color','FontSize', 9);
+xlabel('Number of iterations'); ylabel('Cost function');
+
+figure(); plot(f4);
+title('Cost function for quadratic denoising for green color','FontSize', 9);
+xlabel('Number of iterations'); ylabel('Cost function');
+
+figure(); plot(f5);
+title('Cost function for huber denoising for green color','FontSize', 9);
+xlabel('Number of iterations'); ylabel('Cost function');
+
+figure(); plot(f6);
+title('Cost function for thirdfunc denoising for green color','FontSize', 9);
+xlabel('Number of iterations'); ylabel('Cost function');
+
+figure(); plot(f7);
+title('Cost function for quadratic denoising for blue color','FontSize', 9);
+xlabel('Number of iterations'); ylabel('Cost function');
+
+figure(); plot(f8);
+title('Cost function for huber denoising for blue color','FontSize', 9);
+xlabel('Number of iterations'); ylabel('Cost function');
+
+figure(); plot(f9);
+title('Cost function for thirdfunc denoising for blue color','FontSize', 9);
+xlabel('Number of iterations'); ylabel('Cost function');
+
+
+##### SOURCE END #####
+--></body></html>

@@ -1,0 +1,870 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- saved from url=(0075)https://matlab.mathworks.com/users/mwa0000017355334/Published/q1/index.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+      
+   <!--
+This HTML was auto-generated from MATLAB code.
+To make changes, update the MATLAB code and republish this document.
+      --><title>q1</title><meta name="generator" content="MATLAB 9.7"><link rel="schema.DC" href="http://purl.org/dc/elements/1.1/"><meta name="DC.date" content="2020-02-23"><meta name="DC.source" content="q1.m"><style type="text/css">
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,font,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td{margin:0;padding:0;border:0;outline:0;font-size:100%;vertical-align:baseline;background:transparent}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}:focus{outine:0}ins{text-decoration:none}del{text-decoration:line-through}table{border-collapse:collapse;border-spacing:0}
+
+html { min-height:100%; margin-bottom:1px; }
+html body { height:100%; margin:0px; font-family:Arial, Helvetica, sans-serif; font-size:10px; color:#000; line-height:140%; background:#fff none; overflow-y:scroll; }
+html body td { vertical-align:top; text-align:left; }
+
+h1 { padding:0px; margin:0px 0px 25px; font-family:Arial, Helvetica, sans-serif; font-size:1.5em; color:#d55000; line-height:100%; font-weight:normal; }
+h2 { padding:0px; margin:0px 0px 8px; font-family:Arial, Helvetica, sans-serif; font-size:1.2em; color:#000; font-weight:bold; line-height:140%; border-bottom:1px solid #d6d4d4; display:block; }
+h3 { padding:0px; margin:0px 0px 5px; font-family:Arial, Helvetica, sans-serif; font-size:1.1em; color:#000; font-weight:bold; line-height:140%; }
+
+a { color:#005fce; text-decoration:none; }
+a:hover { color:#005fce; text-decoration:underline; }
+a:visited { color:#004aa0; text-decoration:none; }
+
+p { padding:0px; margin:0px 0px 20px; }
+img { padding:0px; margin:0px 0px 20px; border:none; }
+p img, pre img, tt img, li img, h1 img, h2 img { margin-bottom:0px; } 
+
+ul { padding:0px; margin:0px 0px 20px 23px; list-style:square; }
+ul li { padding:0px; margin:0px 0px 7px 0px; }
+ul li ul { padding:5px 0px 0px; margin:0px 0px 7px 23px; }
+ul li ol li { list-style:decimal; }
+ol { padding:0px; margin:0px 0px 20px 0px; list-style:decimal; }
+ol li { padding:0px; margin:0px 0px 7px 23px; list-style-type:decimal; }
+ol li ol { padding:5px 0px 0px; margin:0px 0px 7px 0px; }
+ol li ol li { list-style-type:lower-alpha; }
+ol li ul { padding-top:7px; }
+ol li ul li { list-style:square; }
+
+.content { font-size:1.2em; line-height:140%; padding: 20px; }
+
+pre, code { font-size:12px; }
+tt { font-size: 1.2em; }
+pre { margin:0px 0px 20px; }
+pre.codeinput { padding:10px; border:1px solid #d3d3d3; background:#f7f7f7; }
+pre.codeoutput { padding:10px 11px; margin:0px 0px 20px; color:#4c4c4c; }
+pre.error { color:red; }
+
+@media print { pre.codeinput, pre.codeoutput { word-wrap:break-word; width:100%; } }
+
+span.keyword { color:#0000FF }
+span.comment { color:#228B22 }
+span.string { color:#A020F0 }
+span.untermstring { color:#B20000 }
+span.syscmd { color:#B28C00 }
+
+.footer { width:auto; padding:10px 0px; margin:25px 0px 0px; border-top:1px dotted #878787; font-size:0.8em; line-height:140%; font-style:italic; color:#878787; text-align:left; float:none; }
+.footer p { margin:0px; }
+.footer a { color:#878787; }
+.footer a:hover { color:#878787; text-decoration:underline; }
+.footer a:visited { color:#878787; }
+
+table th { padding:7px 5px; text-align:left; vertical-align:middle; border: 1px solid #d6d4d4; font-weight:bold; }
+table td { padding:7px 5px; text-align:left; vertical-align:top; border:1px solid #d6d4d4; }
+
+
+
+
+
+  </style></head><body><div class="content"><pre class="codeinput">close <span class="string">all</span>;
+clear <span class="string">all</span>;
+
+<span class="comment">%[X,funcvals] = graddesc(Y,@priormodel,alpha,gamma);</span>
+
+noiseless = double(imread(<span class="string">"mri_image_noiseless.png"</span>));
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (noiseless));
+colormap (myColorScale);
+title(<span class="string">'Noiseless image'</span>,<span class="string">'FontSize'</span>,8);
+daspect ([1 1 1]);
+axis <span class="string">tight</span>;
+colorbar;
+
+
+Y = double(imread(<span class="string">"mri_image_noise_level_low.png"</span>));
+rlow = rrmse(noiseless,Y);
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (Y));
+colormap (myColorScale);
+title(<span class="string">'Low Noise Image'</span>,<span class="string">'FontSize'</span>,8);
+daspect ([1 1 1]);
+axis <span class="string">tight</span>;
+colorbar;
+
+[X, funcvals] = graddesc(Y,@quadratic,0.06,1);
+rlowquad = rrmse(X,noiseless);
+figure(); plot(funcvals);
+title(<span class="string">'Cost function for quadratic denoising for low noise'</span>,<span class="string">'FontSize'</span>, 9);
+xlabel(<span class="string">'Number of iterations'</span>); ylabel(<span class="string">'Cost function'</span>);
+
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (X));
+colormap (myColorScale);
+title(<span class="string">'Denoised image for low noise using quadratic penalty'</span>,<span class="string">'FontSize'</span>,8);
+daspect ([1 1 1]);
+axis <span class="string">tight</span>;
+colorbar;
+
+[X, funcvals] = graddesc(Y,@quadratic,0.06*0.8,1);
+rlowquad08 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@quadratic,0.06*1.2,1);
+rlowquad12 = rrmse(X,noiseless);
+
+[X, funcvals] = graddesc(Y,@huber,0.7,1.5);
+rlowhuber = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@quadratic,0.06,1);
+rlowquad = rrmse(X,noiseless);
+figure(); plot(funcvals);
+title(<span class="string">'Cost function for Huber denoising for low noise'</span>,<span class="string">'FontSize'</span>, 9);
+xlabel(<span class="string">'Number of iterations'</span>); ylabel(<span class="string">'Cost function'</span>);
+
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (X));
+colormap (myColorScale);
+title(<span class="string">'Denoised image for low noise using huber penalty'</span>,<span class="string">'FontSize'</span>,8);
+daspect ([1 1 1]);
+axis <span class="string">tight</span>;
+colorbar;
+
+[X, funcvals] = graddesc(Y,@quadratic,0.7*0.8,1.5);
+rlowhuber0810 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@quadratic,0.7*1.2,1.5);
+rlowhuber1210 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@quadratic,0.7,1.5*0.8);
+rlowhuber1008 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@quadratic,0.7,1.2*1.5);
+rlowhuber1012 = rrmse(X,noiseless);
+
+[X, funcvals] = graddesc(Y,@thirdfunc,0.86,0.6);
+rlowthird = rrmse(X,noiseless);
+figure(); plot(funcvals);
+title(<span class="string">'Cost function for third denoising for low noise'</span>,<span class="string">'FontSize'</span>, 9);
+xlabel(<span class="string">'Number of iterations'</span>); ylabel(<span class="string">'Cost function'</span>);
+
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (X));
+colormap (myColorScale);
+title(<span class="string">'Denoised image for low noise using third penalty'</span>,<span class="string">'FontSize'</span>,8);
+daspect ([1 1 1]);
+axis <span class="string">tight</span>;
+colorbar;
+[X, funcvals] = graddesc(Y,@thirdfunc,0.86*0.8,0.6);
+rlowthird0810 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@thirdfunc,0.86*1.2,0.6);
+rlowthird1210 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@thirdfunc,0.86,0.6*0.8);
+rlowthird1008 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@thirdfunc,0.86,0.6*1.2);
+rlowthird1012 = rrmse(X,noiseless);
+
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (noiseless));
+colormap (myColorScale);
+title(<span class="string">'Noiseless image'</span>,<span class="string">'FontSize'</span>,8);
+daspect ([1 1 1]);
+axis <span class="string">tight</span>;
+colorbar;
+
+Y = double(imread(<span class="string">"mri_image_noise_level_medium.png"</span>));
+rmed = rrmse(noiseless,Y);
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (Y));
+colormap (myColorScale);
+title(<span class="string">'Medium Noise Image'</span>,<span class="string">'FontSize'</span>,8);
+daspect ([1 1 1]);
+axis <span class="string">tight</span>;
+colorbar;
+[X, funcvals] = graddesc(Y,@quadratic,0.11,1);
+rmedquad = rrmse(noiseless,X);
+figure(); plot(funcvals);
+title(<span class="string">'Cost function for quadratic denoising for medium noise'</span>,<span class="string">'FontSize'</span>, 9);
+xlabel(<span class="string">'Number of iterations'</span>); ylabel(<span class="string">'Cost function'</span>);
+
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (X));
+colormap (myColorScale);
+title(<span class="string">'Denoised image for medium noise using quadratic penalty'</span>,<span class="string">'FontSize'</span>,8);
+daspect ([1 1 1]);
+axis <span class="string">tight</span>;
+colorbar;
+
+[X, funcvals] = graddesc(Y,@quadratic,0.11*0.8,1);
+rmedquad08 = rrmse(noiseless,X);
+[X, funcvals] = graddesc(Y,@quadratic,0.11*1.2,1);
+rmedquad12 = rrmse(noiseless,X);
+
+[X, funcvals] = graddesc(Y,@huber,0.75,3.2);
+rmedhuber = rrmse(noiseless,X);
+figure(); plot(funcvals);
+title(<span class="string">'Cost function for huber denoising for medium noise'</span>,<span class="string">'FontSize'</span>, 9);
+xlabel(<span class="string">'Number of iterations'</span>); ylabel(<span class="string">'Cost function'</span>);
+
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (X));
+colormap (myColorScale);
+title(<span class="string">'Denoised image for medium noise using huber penalty'</span>,<span class="string">'FontSize'</span>,8);
+daspect ([1 1 1]);
+axis <span class="string">tight</span>;
+colorbar;
+[X, funcvals] = graddesc(Y,@huber,0.75*0.8,3.2);
+rmedhuber0810 = rrmse(noiseless,X);
+[X, funcvals] = graddesc(Y,@huber,0.75*1.2,3.2);
+rmedhuber1210 = rrmse(noiseless,X);
+[X, funcvals] = graddesc(Y,@huber,0.75,3.2*0.8);
+rmedhuber1008 = rrmse(noiseless,X);
+[X, funcvals] = graddesc(Y,@huber,0.75,3.2*1.2);
+rmedhuber1012 = rrmse(noiseless,X);
+
+[X, funcvals] = graddesc(Y,@thirdfunc,0.7,5);
+rmedthird = rrmse(noiseless,X);
+figure(); plot(funcvals);
+title(<span class="string">'Cost function for third denoising for medium noise'</span>,<span class="string">'FontSize'</span>, 9);
+xlabel(<span class="string">'Number of iterations'</span>); ylabel(<span class="string">'Cost function'</span>);
+
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (X));
+colormap (myColorScale);
+title(<span class="string">'Denoised image for medium noise using third penalty'</span>,<span class="string">'FontSize'</span>,8);
+daspect ([1 1 1]);
+axis <span class="string">tight</span>;
+colorbar;
+
+[X, funcvals] = graddesc(Y,@thirdfunc,0.7*0.8,5);
+rmedthird0810 = rrmse(noiseless,X);
+[X, funcvals] = graddesc(Y,@thirdfunc,0.7*1.2,5);
+rmedthird1210 = rrmse(noiseless,X);
+[X, funcvals] = graddesc(Y,@thirdfunc,0.7,5*0.8);
+rmedthird1008 = rrmse(noiseless,X);
+[X, funcvals] = graddesc(Y,@thirdfunc,0.7,5*1.2);
+rmedthird1012 = rrmse(noiseless,X);
+
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (noiseless));
+colormap (myColorScale);
+title(<span class="string">'Noiseless image'</span>,<span class="string">'FontSize'</span>,9);
+daspect ([1 1 1]);
+axis <span class="string">tight</span>;
+colorbar;
+
+Y = double(imread(<span class="string">"mri_image_noise_level_high.png"</span>));
+rhigh = rrmse(Y,noiseless);
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (Y));
+colormap (myColorScale);
+title(<span class="string">'High Noise Image'</span>,<span class="string">'FontSize'</span>,8);
+daspect ([1 1 1]);
+axis <span class="string">tight</span>;
+colorbar;
+
+[X, funcvals] = graddesc(Y,@quadratic,0.305,1);
+rhighquad = rrmse(X,noiseless);
+figure(); plot(funcvals);
+title(<span class="string">'Cost function for quadratic denoising for high noise'</span>,<span class="string">'FontSize'</span>, 9);
+xlabel(<span class="string">'Number of iterations'</span>); ylabel(<span class="string">'Cost function'</span>);
+
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (X));
+colormap (myColorScale);
+title(<span class="string">'Denoised image for high noise using quadratic penalty'</span>,<span class="string">'FontSize'</span>,8);
+daspect ([1 1 1]);
+axis <span class="string">tight</span>;
+colorbar;
+
+[X, funcvals] = graddesc(Y,@quadratic,0.305*0.8,1);
+rhighquad08 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@quadratic,0.305*1.2,1);
+rhighquad12 = rrmse(X,noiseless);
+
+[X, funcvals] = graddesc(Y,@huber,0.775,3.5);
+rhighhuber = rrmse(X,noiseless);
+
+figure(); plot(funcvals);
+title(<span class="string">'Cost function for huber denoising for high noise'</span>,<span class="string">'FontSize'</span>, 9);
+xlabel(<span class="string">'Number of iterations'</span>); ylabel(<span class="string">'Cost function'</span>);
+
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (X));
+colormap (myColorScale);
+title(<span class="string">'Denoised image for high noise using huber penalty'</span>,<span class="string">'FontSize'</span>,8);
+daspect ([1 1 1]);
+axis <span class="string">tight</span>;
+colorbar;
+[X, funcvals] = graddesc(Y,@huber,0.775*0.8,3.5);
+rhighhuber0810 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@huber,0.775*1.2,3.5);
+rhighhuber1210 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@huber,0.775,3.5*0.8);
+rhighhuber1008 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@huber,0.775,3.5*1.2);
+rhighhuber1012 = rrmse(X,noiseless);
+
+[X, funcvals] = graddesc(Y,@thirdfunc,0.87,2.1);
+rhighthird = rrmse(X,noiseless);
+
+figure(); plot(funcvals);
+title(<span class="string">'Cost function for third denoising for high noise'</span>,<span class="string">'FontSize'</span>, 9);
+xlabel(<span class="string">'Number of iterations'</span>); ylabel(<span class="string">'Cost function'</span>);
+
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (X));
+colormap (myColorScale);
+title(<span class="string">'Denoised image for high noise using third penalty'</span>,<span class="string">'FontSize'</span>,8);
+daspect ([1 1 1]);
+axis <span class="string">tight</span>;
+colorbar;
+
+[X, funcvals] = graddesc(Y,@thirdfunc,0.87*0.8,2.1);
+rhighthird0810 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@thirdfunc,0.87*1.2,2.1);
+rhighthird1210 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@thirdfunc,0.87,2.1*0.8);
+rhighthird1008 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@thirdfunc,0.87,2.1*1.2);
+rhighthird1012 = rrmse(X,noiseless);
+
+
+rs = [rlow,rlowquad,rlowhuber,rlowthird;
+      rmed,rmedquad,rmedhuber,rmedthird;
+      rhigh,rhighquad,rhighhuber,rhighthird];
+
+fprintf(<span class="string">'\n \n \n Denoising Low noise Using Quadratic Prior'</span>);
+fprintf(strcat(<span class="string">'\n Optimal Alpha = '</span>,num2str(0.06)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha) = '</span>,num2str(rlowquad)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*0.8) = '</span>, num2str(rlowquad08)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*1.2) = '</span>, num2str(rlowquad12)));
+
+fprintf(<span class="string">'\n \n Denoising Medium noise Using Quadratic Prior'</span>);
+fprintf(strcat(<span class="string">'\n Optimal Alpha = '</span>,num2str(0.11)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha) = '</span>,num2str(rmedquad)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*0.8) = '</span>, num2str(rmedquad08)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*1.2) = '</span>, num2str(rmedquad12)));
+
+fprintf(<span class="string">'\n \n Denoising High noise Using Quadratic Prior'</span>);
+fprintf(strcat(<span class="string">'\n Optimal Alpha = '</span>,num2str(0.305)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha) = '</span>,num2str(rhighquad)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*0.8) = '</span>, num2str(rhighquad08)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*1.2) = '</span>, num2str(rhighquad12)));
+
+fprintf(<span class="string">'\n \n Denoising Low noise Using Huber Prior'</span>);
+fprintf(strcat(<span class="string">'\n Optimal Alpha = '</span>,num2str(0.7)));
+fprintf(strcat(<span class="string">'\n Optimal Gamma = '</span>,num2str(1.5)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,Gamma) = '</span>,num2str(rlowhuber)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*0.8,Gamma) = '</span>, num2str(rlowhuber0810)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*1.2,Gamma) = '</span>, num2str(rlowhuber1210)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,0.8*Gamma) = '</span>, num2str(rlowhuber1008)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,1.2*Gamma) = '</span>, num2str(rlowhuber1012)));
+
+fprintf(<span class="string">'\n \n Denoising Medium noise Using Huber Prior'</span>);
+fprintf(strcat(<span class="string">'\n Optimal Alpha = '</span>,num2str(0.75)));
+fprintf(strcat(<span class="string">'\n Optimal Gamma = '</span>,num2str(3.2)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,Gamma) = '</span>,num2str(rmedhuber)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*0.8,Gamma) = '</span>, num2str(rmedhuber0810)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*1.2,Gamma) = '</span>, num2str(rmedhuber1210)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,0.8*Gamma) = '</span>, num2str(rmedhuber1008)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,1.2*Gamma) = '</span>, num2str(rmedhuber1012)));
+
+fprintf(<span class="string">'\n \n Denoising High noise Using Huber Prior'</span>);
+fprintf(strcat(<span class="string">'\n Optimal Alpha = '</span>,num2str(0.775)));
+fprintf(strcat(<span class="string">'\n Optimal Gamma = '</span>,num2str(3.5)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,Gamma) = '</span>,num2str(rhighhuber)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*0.8,Gamma) = '</span>, num2str(rhighhuber0810)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*1.2,Gamma) = '</span>, num2str(rhighhuber1210)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,0.8*Gamma) = '</span>, num2str(rhighhuber1008)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,1.2*Gamma) = '</span>, num2str(rhighhuber1012)));
+
+fprintf(<span class="string">'\n \n Denoising Low noise Using Third Prior'</span>);
+fprintf(strcat(<span class="string">'\n Optimal Alpha = '</span>,num2str(0.86)));
+fprintf(strcat(<span class="string">'\n Optimal Gamma = '</span>,num2str(0.6)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,Gamma) = '</span>,num2str(rlowthird)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*0.8,Gamma) = '</span>, num2str(rlowthird0810)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*1.2,Gamma) = '</span>, num2str(rlowthird1210)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,0.8*Gamma) = '</span>, num2str(rlowthird1008)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,1.2*Gamma) = '</span>, num2str(rlowthird1012)));
+
+fprintf(<span class="string">'\n \n Denoising Medium noise Using Third Prior'</span>);
+fprintf(strcat(<span class="string">'\n Optimal Alpha = '</span>,num2str(0.7)));
+fprintf(strcat(<span class="string">'\n Optimal Gamma = '</span>,num2str(5)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,Gamma) = '</span>,num2str(rmedthird)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*0.8,Gamma) = '</span>, num2str(rmedthird0810)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*1.2,Gamma) = '</span>, num2str(rmedthird1210)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,0.8*Gamma) = '</span>, num2str(rmedthird1008)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,1.2*Gamma) = '</span>, num2str(rmedthird1012)));
+<span class="comment">%</span>
+fprintf(<span class="string">'\n \n Denoising High noise Using Third Prior'</span>);
+fprintf(strcat(<span class="string">'\n Optimal Alpha = '</span>,num2str(0.87)));
+fprintf(strcat(<span class="string">'\n Optimal Gamma = '</span>,num2str(2.1)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,Gamma) = '</span>,num2str(rhighthird)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*0.8,Gamma) = '</span>, num2str(rhighthird0810)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha*1.2,Gamma) = '</span>, num2str(rhighthird1210)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,0.8*Gamma) = '</span>, num2str(rhighthird1008)));
+fprintf(strcat(<span class="string">'\n RRMSE(alpha,1.2*Gamma) = '</span>, num2str(rhighthird1012)));
+</pre><pre class="codeoutput"> 
+ 
+ Denoising Low noise Using Quadratic Prior
+ Optimal Alpha =0.06
+ RRMSE(alpha) =0.046009
+ RRMSE(alpha*0.8) =0.04603
+ RRMSE(alpha*1.2) =0.046458
+ 
+ Denoising Medium noise Using Quadratic Prior
+ Optimal Alpha =0.11
+ RRMSE(alpha) =0.1133
+ RRMSE(alpha*0.8) =0.11396
+ RRMSE(alpha*1.2) =0.11279
+ 
+ Denoising High noise Using Quadratic Prior
+ Optimal Alpha =0.305
+ RRMSE(alpha) =0.12856
+ RRMSE(alpha*0.8) =0.12819
+ RRMSE(alpha*1.2) =0.13078
+ 
+ Denoising Low noise Using Huber Prior
+ Optimal Alpha =0.7
+ Optimal Gamma =1.5
+ RRMSE(alpha,Gamma) =0.042854
+ RRMSE(alpha*0.8,Gamma) =0.12475
+ RRMSE(alpha*1.2,Gamma) =0.23033
+ RRMSE(alpha,0.8*Gamma) =0.16843
+ RRMSE(alpha,1.2*Gamma) =0.16843
+ 
+ Denoising Medium noise Using Huber Prior
+ Optimal Alpha =0.75
+ Optimal Gamma =3.2
+ RRMSE(alpha,Gamma) =0.11099
+ RRMSE(alpha*0.8,Gamma) =0.11186
+ RRMSE(alpha*1.2,Gamma) =0.14335
+ RRMSE(alpha,0.8*Gamma) =0.11074
+ RRMSE(alpha,1.2*Gamma) =0.11151
+ 
+ Denoising High noise Using Huber Prior
+ Optimal Alpha =0.775
+ Optimal Gamma =3.5
+ RRMSE(alpha,Gamma) =0.12662
+ RRMSE(alpha*0.8,Gamma) =0.12986
+ RRMSE(alpha*1.2,Gamma) =0.18619
+ RRMSE(alpha,0.8*Gamma) =0.12679
+ RRMSE(alpha,1.2*Gamma) =0.12699
+ 
+ Denoising Low noise Using Third Prior
+ Optimal Alpha =0.86
+ Optimal Gamma =0.6
+ RRMSE(alpha,Gamma) =0.042754
+ RRMSE(alpha*0.8,Gamma) =0.044432
+ RRMSE(alpha*1.2,Gamma) =0.062735
+ RRMSE(alpha,0.8*Gamma) =0.042758
+ RRMSE(alpha,1.2*Gamma) =0.042918
+ 
+ Denoising Medium noise Using Third Prior
+ Optimal Alpha =0.7
+ Optimal Gamma =5
+ RRMSE(alpha,Gamma) =0.11026
+ RRMSE(alpha*0.8,Gamma) =0.11147
+ RRMSE(alpha*1.2,Gamma) =0.11646
+ RRMSE(alpha,0.8*Gamma) =0.11034
+ RRMSE(alpha,1.2*Gamma) =0.11043
+ 
+ Denoising High noise Using Third Prior
+ Optimal Alpha =0.87
+ Optimal Gamma =2.1
+ RRMSE(alpha,Gamma) =0.12604
+ RRMSE(alpha*0.8,Gamma) =0.13267
+ RRMSE(alpha*1.2,Gamma) =0.15746
+ RRMSE(alpha,0.8*Gamma) =0.12621
+ RRMSE(alpha,1.2*Gamma) =0.12623</pre><img vspace="5" hspace="5" src="./q1_files/q1_01.png" alt=""> <img vspace="5" hspace="5" src="./q1_files/q1_02.png" alt=""> <img vspace="5" hspace="5" src="./q1_files/q1_03.png" alt=""> <img vspace="5" hspace="5" src="./q1_files/q1_04.png" alt=""> <img vspace="5" hspace="5" src="./q1_files/q1_05.png" alt=""> <img vspace="5" hspace="5" src="./q1_files/q1_06.png" alt=""> <img vspace="5" hspace="5" src="./q1_files/q1_07.png" alt=""> <img vspace="5" hspace="5" src="./q1_files/q1_08.png" alt=""> <img vspace="5" hspace="5" src="./q1_files/q1_09.png" alt=""> <img vspace="5" hspace="5" src="./q1_files/q1_10.png" alt=""> <img vspace="5" hspace="5" src="./q1_files/q1_11.png" alt=""> <img vspace="5" hspace="5" src="./q1_files/q1_12.png" alt=""> <img vspace="5" hspace="5" src="./q1_files/q1_13.png" alt=""> <img vspace="5" hspace="5" src="./q1_files/q1_14.png" alt=""> <img vspace="5" hspace="5" src="./q1_files/q1_15.png" alt=""> <img vspace="5" hspace="5" src="./q1_files/q1_16.png" alt=""> <img vspace="5" hspace="5" src="./q1_files/q1_17.png" alt=""> <img vspace="5" hspace="5" src="./q1_files/q1_18.png" alt=""> <img vspace="5" hspace="5" src="./q1_files/q1_19.png" alt=""> <img vspace="5" hspace="5" src="./q1_files/q1_20.png" alt=""> <img vspace="5" hspace="5" src="./q1_files/q1_21.png" alt=""> <img vspace="5" hspace="5" src="./q1_files/q1_22.png" alt=""> <img vspace="5" hspace="5" src="./q1_files/q1_23.png" alt=""> <img vspace="5" hspace="5" src="./q1_files/q1_24.png" alt=""> <p class="footer"><br><a href="https://www.mathworks.com/products/matlab/">Published with MATLAB® R2019b</a><br></p></div><!--
+##### SOURCE BEGIN #####
+close all;
+clear all;
+
+%[X,funcvals] = graddesc(Y,@priormodel,alpha,gamma);
+
+noiseless = double(imread("mri_image_noiseless.png"));
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (noiseless)); 
+colormap (myColorScale);
+title('Noiseless image','FontSize',8);
+daspect ([1 1 1]);
+axis tight;
+colorbar;
+
+
+Y = double(imread("mri_image_noise_level_low.png"));
+rlow = rrmse(noiseless,Y);
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (Y)); 
+colormap (myColorScale);
+title('Low Noise Image','FontSize',8);
+daspect ([1 1 1]);
+axis tight;
+colorbar;
+
+[X, funcvals] = graddesc(Y,@quadratic,0.06,1);
+rlowquad = rrmse(X,noiseless);
+figure(); plot(funcvals);
+title('Cost function for quadratic denoising for low noise','FontSize', 9);
+xlabel('Number of iterations'); ylabel('Cost function');
+
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (X)); 
+colormap (myColorScale);
+title('Denoised image for low noise using quadratic penalty','FontSize',8);
+daspect ([1 1 1]);
+axis tight;
+colorbar;
+
+[X, funcvals] = graddesc(Y,@quadratic,0.06*0.8,1);
+rlowquad08 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@quadratic,0.06*1.2,1);
+rlowquad12 = rrmse(X,noiseless);
+
+[X, funcvals] = graddesc(Y,@huber,0.7,1.5);
+rlowhuber = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@quadratic,0.06,1);
+rlowquad = rrmse(X,noiseless);
+figure(); plot(funcvals);
+title('Cost function for Huber denoising for low noise','FontSize', 9);
+xlabel('Number of iterations'); ylabel('Cost function');
+
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (X)); 
+colormap (myColorScale);
+title('Denoised image for low noise using huber penalty','FontSize',8);
+daspect ([1 1 1]);
+axis tight;
+colorbar;
+
+[X, funcvals] = graddesc(Y,@quadratic,0.7*0.8,1.5);
+rlowhuber0810 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@quadratic,0.7*1.2,1.5);
+rlowhuber1210 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@quadratic,0.7,1.5*0.8);
+rlowhuber1008 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@quadratic,0.7,1.2*1.5);
+rlowhuber1012 = rrmse(X,noiseless);
+
+[X, funcvals] = graddesc(Y,@thirdfunc,0.86,0.6);
+rlowthird = rrmse(X,noiseless);
+figure(); plot(funcvals);
+title('Cost function for third denoising for low noise','FontSize', 9);
+xlabel('Number of iterations'); ylabel('Cost function');
+
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (X)); 
+colormap (myColorScale);
+title('Denoised image for low noise using third penalty','FontSize',8);
+daspect ([1 1 1]);
+axis tight;
+colorbar;
+[X, funcvals] = graddesc(Y,@thirdfunc,0.86*0.8,0.6);
+rlowthird0810 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@thirdfunc,0.86*1.2,0.6);
+rlowthird1210 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@thirdfunc,0.86,0.6*0.8);
+rlowthird1008 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@thirdfunc,0.86,0.6*1.2);
+rlowthird1012 = rrmse(X,noiseless);
+
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (noiseless)); 
+colormap (myColorScale);
+title('Noiseless image','FontSize',8);
+daspect ([1 1 1]);
+axis tight;
+colorbar;
+
+Y = double(imread("mri_image_noise_level_medium.png"));
+rmed = rrmse(noiseless,Y);
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (Y)); 
+colormap (myColorScale);
+title('Medium Noise Image','FontSize',8);
+daspect ([1 1 1]);
+axis tight;
+colorbar;
+[X, funcvals] = graddesc(Y,@quadratic,0.11,1); 
+rmedquad = rrmse(noiseless,X);
+figure(); plot(funcvals);
+title('Cost function for quadratic denoising for medium noise','FontSize', 9);
+xlabel('Number of iterations'); ylabel('Cost function');
+
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (X)); 
+colormap (myColorScale);
+title('Denoised image for medium noise using quadratic penalty','FontSize',8);
+daspect ([1 1 1]);
+axis tight;
+colorbar;
+
+[X, funcvals] = graddesc(Y,@quadratic,0.11*0.8,1); 
+rmedquad08 = rrmse(noiseless,X);
+[X, funcvals] = graddesc(Y,@quadratic,0.11*1.2,1); 
+rmedquad12 = rrmse(noiseless,X);
+
+[X, funcvals] = graddesc(Y,@huber,0.75,3.2); 
+rmedhuber = rrmse(noiseless,X);
+figure(); plot(funcvals);
+title('Cost function for huber denoising for medium noise','FontSize', 9);
+xlabel('Number of iterations'); ylabel('Cost function');
+
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (X)); 
+colormap (myColorScale);
+title('Denoised image for medium noise using huber penalty','FontSize',8);
+daspect ([1 1 1]);
+axis tight;
+colorbar;
+[X, funcvals] = graddesc(Y,@huber,0.75*0.8,3.2); 
+rmedhuber0810 = rrmse(noiseless,X);
+[X, funcvals] = graddesc(Y,@huber,0.75*1.2,3.2); 
+rmedhuber1210 = rrmse(noiseless,X);
+[X, funcvals] = graddesc(Y,@huber,0.75,3.2*0.8); 
+rmedhuber1008 = rrmse(noiseless,X);
+[X, funcvals] = graddesc(Y,@huber,0.75,3.2*1.2); 
+rmedhuber1012 = rrmse(noiseless,X);
+
+[X, funcvals] = graddesc(Y,@thirdfunc,0.7,5);
+rmedthird = rrmse(noiseless,X);
+figure(); plot(funcvals);
+title('Cost function for third denoising for medium noise','FontSize', 9);
+xlabel('Number of iterations'); ylabel('Cost function');
+
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (X)); 
+colormap (myColorScale);
+title('Denoised image for medium noise using third penalty','FontSize',8);
+daspect ([1 1 1]);
+axis tight;
+colorbar;
+
+[X, funcvals] = graddesc(Y,@thirdfunc,0.7*0.8,5);
+rmedthird0810 = rrmse(noiseless,X);
+[X, funcvals] = graddesc(Y,@thirdfunc,0.7*1.2,5);
+rmedthird1210 = rrmse(noiseless,X);
+[X, funcvals] = graddesc(Y,@thirdfunc,0.7,5*0.8);
+rmedthird1008 = rrmse(noiseless,X);
+[X, funcvals] = graddesc(Y,@thirdfunc,0.7,5*1.2);
+rmedthird1012 = rrmse(noiseless,X);
+
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (noiseless)); 
+colormap (myColorScale);
+title('Noiseless image','FontSize',9);
+daspect ([1 1 1]);
+axis tight;
+colorbar;
+
+Y = double(imread("mri_image_noise_level_high.png"));
+rhigh = rrmse(Y,noiseless);
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (Y)); 
+colormap (myColorScale);
+title('High Noise Image','FontSize',8);
+daspect ([1 1 1]);
+axis tight;
+colorbar;
+
+[X, funcvals] = graddesc(Y,@quadratic,0.305,1); 
+rhighquad = rrmse(X,noiseless);
+figure(); plot(funcvals);
+title('Cost function for quadratic denoising for high noise','FontSize', 9);
+xlabel('Number of iterations'); ylabel('Cost function');
+
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (X)); 
+colormap (myColorScale);
+title('Denoised image for high noise using quadratic penalty','FontSize',8);
+daspect ([1 1 1]);
+axis tight;
+colorbar;
+
+[X, funcvals] = graddesc(Y,@quadratic,0.305*0.8,1); 
+rhighquad08 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@quadratic,0.305*1.2,1); 
+rhighquad12 = rrmse(X,noiseless);
+
+[X, funcvals] = graddesc(Y,@huber,0.775,3.5);
+rhighhuber = rrmse(X,noiseless);
+
+figure(); plot(funcvals);
+title('Cost function for huber denoising for high noise','FontSize', 9);
+xlabel('Number of iterations'); ylabel('Cost function');
+
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (X)); 
+colormap (myColorScale);
+title('Denoised image for high noise using huber penalty','FontSize',8);
+daspect ([1 1 1]);
+axis tight;
+colorbar;
+[X, funcvals] = graddesc(Y,@huber,0.775*0.8,3.5);
+rhighhuber0810 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@huber,0.775*1.2,3.5);
+rhighhuber1210 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@huber,0.775,3.5*0.8);
+rhighhuber1008 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@huber,0.775,3.5*1.2);
+rhighhuber1012 = rrmse(X,noiseless);
+
+[X, funcvals] = graddesc(Y,@thirdfunc,0.87,2.1); 
+rhighthird = rrmse(X,noiseless);
+
+figure(); plot(funcvals);
+title('Cost function for third denoising for high noise','FontSize', 9);
+xlabel('Number of iterations'); ylabel('Cost function');
+
+figure();
+myNumOfColors = 200;
+myColorScale = [ [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' , [0:1/(myNumOfColors-1):1]' ];
+imagesc (single (X)); 
+colormap (myColorScale);
+title('Denoised image for high noise using third penalty','FontSize',8);
+daspect ([1 1 1]);
+axis tight;
+colorbar;
+
+[X, funcvals] = graddesc(Y,@thirdfunc,0.87*0.8,2.1); 
+rhighthird0810 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@thirdfunc,0.87*1.2,2.1); 
+rhighthird1210 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@thirdfunc,0.87,2.1*0.8); 
+rhighthird1008 = rrmse(X,noiseless);
+[X, funcvals] = graddesc(Y,@thirdfunc,0.87,2.1*1.2); 
+rhighthird1012 = rrmse(X,noiseless);
+
+
+rs = [rlow,rlowquad,rlowhuber,rlowthird;
+      rmed,rmedquad,rmedhuber,rmedthird;
+      rhigh,rhighquad,rhighhuber,rhighthird];
+  
+fprintf('\n \n \n Denoising Low noise Using Quadratic Prior');
+fprintf(strcat('\n Optimal Alpha = ',num2str(0.06)));
+fprintf(strcat('\n RRMSE(alpha) = ',num2str(rlowquad)));
+fprintf(strcat('\n RRMSE(alpha*0.8) = ', num2str(rlowquad08)));
+fprintf(strcat('\n RRMSE(alpha*1.2) = ', num2str(rlowquad12)));
+
+fprintf('\n \n Denoising Medium noise Using Quadratic Prior');
+fprintf(strcat('\n Optimal Alpha = ',num2str(0.11)));
+fprintf(strcat('\n RRMSE(alpha) = ',num2str(rmedquad)));
+fprintf(strcat('\n RRMSE(alpha*0.8) = ', num2str(rmedquad08)));
+fprintf(strcat('\n RRMSE(alpha*1.2) = ', num2str(rmedquad12)));
+
+fprintf('\n \n Denoising High noise Using Quadratic Prior');
+fprintf(strcat('\n Optimal Alpha = ',num2str(0.305)));
+fprintf(strcat('\n RRMSE(alpha) = ',num2str(rhighquad)));
+fprintf(strcat('\n RRMSE(alpha*0.8) = ', num2str(rhighquad08)));
+fprintf(strcat('\n RRMSE(alpha*1.2) = ', num2str(rhighquad12)));
+
+fprintf('\n \n Denoising Low noise Using Huber Prior');
+fprintf(strcat('\n Optimal Alpha = ',num2str(0.7)));
+fprintf(strcat('\n Optimal Gamma = ',num2str(1.5)));
+fprintf(strcat('\n RRMSE(alpha,Gamma) = ',num2str(rlowhuber)));
+fprintf(strcat('\n RRMSE(alpha*0.8,Gamma) = ', num2str(rlowhuber0810)));
+fprintf(strcat('\n RRMSE(alpha*1.2,Gamma) = ', num2str(rlowhuber1210)));
+fprintf(strcat('\n RRMSE(alpha,0.8*Gamma) = ', num2str(rlowhuber1008)));
+fprintf(strcat('\n RRMSE(alpha,1.2*Gamma) = ', num2str(rlowhuber1012)));
+
+fprintf('\n \n Denoising Medium noise Using Huber Prior');
+fprintf(strcat('\n Optimal Alpha = ',num2str(0.75)));
+fprintf(strcat('\n Optimal Gamma = ',num2str(3.2)));
+fprintf(strcat('\n RRMSE(alpha,Gamma) = ',num2str(rmedhuber)));
+fprintf(strcat('\n RRMSE(alpha*0.8,Gamma) = ', num2str(rmedhuber0810)));
+fprintf(strcat('\n RRMSE(alpha*1.2,Gamma) = ', num2str(rmedhuber1210)));
+fprintf(strcat('\n RRMSE(alpha,0.8*Gamma) = ', num2str(rmedhuber1008)));
+fprintf(strcat('\n RRMSE(alpha,1.2*Gamma) = ', num2str(rmedhuber1012)));
+
+fprintf('\n \n Denoising High noise Using Huber Prior');
+fprintf(strcat('\n Optimal Alpha = ',num2str(0.775)));
+fprintf(strcat('\n Optimal Gamma = ',num2str(3.5)));
+fprintf(strcat('\n RRMSE(alpha,Gamma) = ',num2str(rhighhuber)));
+fprintf(strcat('\n RRMSE(alpha*0.8,Gamma) = ', num2str(rhighhuber0810)));
+fprintf(strcat('\n RRMSE(alpha*1.2,Gamma) = ', num2str(rhighhuber1210)));
+fprintf(strcat('\n RRMSE(alpha,0.8*Gamma) = ', num2str(rhighhuber1008)));
+fprintf(strcat('\n RRMSE(alpha,1.2*Gamma) = ', num2str(rhighhuber1012)));
+
+fprintf('\n \n Denoising Low noise Using Third Prior');
+fprintf(strcat('\n Optimal Alpha = ',num2str(0.86)));
+fprintf(strcat('\n Optimal Gamma = ',num2str(0.6)));
+fprintf(strcat('\n RRMSE(alpha,Gamma) = ',num2str(rlowthird)));
+fprintf(strcat('\n RRMSE(alpha*0.8,Gamma) = ', num2str(rlowthird0810)));
+fprintf(strcat('\n RRMSE(alpha*1.2,Gamma) = ', num2str(rlowthird1210)));
+fprintf(strcat('\n RRMSE(alpha,0.8*Gamma) = ', num2str(rlowthird1008)));
+fprintf(strcat('\n RRMSE(alpha,1.2*Gamma) = ', num2str(rlowthird1012)));
+
+fprintf('\n \n Denoising Medium noise Using Third Prior');
+fprintf(strcat('\n Optimal Alpha = ',num2str(0.7)));
+fprintf(strcat('\n Optimal Gamma = ',num2str(5)));
+fprintf(strcat('\n RRMSE(alpha,Gamma) = ',num2str(rmedthird)));
+fprintf(strcat('\n RRMSE(alpha*0.8,Gamma) = ', num2str(rmedthird0810)));
+fprintf(strcat('\n RRMSE(alpha*1.2,Gamma) = ', num2str(rmedthird1210)));
+fprintf(strcat('\n RRMSE(alpha,0.8*Gamma) = ', num2str(rmedthird1008)));
+fprintf(strcat('\n RRMSE(alpha,1.2*Gamma) = ', num2str(rmedthird1012)));
+% 
+fprintf('\n \n Denoising High noise Using Third Prior');
+fprintf(strcat('\n Optimal Alpha = ',num2str(0.87)));
+fprintf(strcat('\n Optimal Gamma = ',num2str(2.1)));
+fprintf(strcat('\n RRMSE(alpha,Gamma) = ',num2str(rhighthird)));
+fprintf(strcat('\n RRMSE(alpha*0.8,Gamma) = ', num2str(rhighthird0810)));
+fprintf(strcat('\n RRMSE(alpha*1.2,Gamma) = ', num2str(rhighthird1210)));
+fprintf(strcat('\n RRMSE(alpha,0.8*Gamma) = ', num2str(rhighthird1008)));
+fprintf(strcat('\n RRMSE(alpha,1.2*Gamma) = ', num2str(rhighthird1012)));
+
+
+
+##### SOURCE END #####
+--></body></html>
